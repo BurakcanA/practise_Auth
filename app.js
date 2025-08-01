@@ -17,12 +17,20 @@ app.use(session({
     // cookie: { secure: true }
 }))
 
+const requireLogin = (req, res, next) => {
+    if(req.session.user_id == null)
+    {
+        return res.redirect('./login')
+    }
+    next();
+}
+
 const db = mongoose.connection;
 mongoose.connect('mongodb://127.0.0.1:27017/Auth')
 db.on('error', err => console.log(`Connection Failed: ${err}`))
 db.once('open',() => console.log('Database Connected!'))
 
-app.get('/secret', (req,res) => {
+app.get('/secret', requireLogin, (req,res) => {
     if(req.session.user_id != null)
     {
         res.send('You are still logged in and this is result')
